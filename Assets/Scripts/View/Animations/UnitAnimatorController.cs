@@ -6,11 +6,11 @@ using UnityEngine;
 public class UnitAnimatorController : MonoBehaviour
 {
     [SerializeField] private Animator _animator;
-    private Movement _movement;
+    private MoveAction _movement;
 
     private void Awake() 
     {
-        _movement = GetComponent<Movement>();
+        _movement = GetComponent<MoveAction>();
     }
 
     private void OnEnable() 

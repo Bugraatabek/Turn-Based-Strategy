@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Movement : MonoBehaviour
+public class MoveAction : MonoBehaviour
 {
     [SerializeField] private float _moveSpeed = 4f;
     [SerializeField] private float _rotationSpeed = 10f;
+    [SerializeField] private int maxMoveDistance;
     
     private Vector3 targetPosition;
     private GridPosition _currentGridPosition;
@@ -43,15 +44,16 @@ public class Movement : MonoBehaviour
             {
                 isMoving = false;
                 OnMovingStateChanged?.Invoke(false);
-                CheckCurrentGridPosition();
+                CheckCurrentGridPosition(); // updates _currentGridPosition after the action finishes.
                 yield break;
             }
             Vector3 moveDirection = (targetPosition - transform.position).normalized;
             transform.position += moveDirection * _moveSpeed * Time.deltaTime;
             RotateUnit(moveDirection);
-            CheckCurrentGridPosition();
+            //CheckCurrentGridPosition(); if you want to update _currentGridPosition every time position changes uncomment this.
             yield return null;
         }
+        
     }
 
     private void RotateUnit(Vector3 rotateDirection)
@@ -67,5 +69,20 @@ public class Movement : MonoBehaviour
             _currentGridPosition = gridPosition;
             onGridPositionChanged?.Invoke(_currentGridPosition);
         }
+    }
+    
+    public List<GridPosition> GetGridPositionsInMovementRange()
+    {
+        List<GridPosition> gridPositionInMovementRange = new List<GridPosition>();
+        for (int x = -maxMoveDistance; x <= maxMoveDistance; x++)
+        {
+            for (int z = -maxMoveDistance; z <= maxMoveDistance; z++)            
+            {
+                GridPosition offsetGridPosition = new GridPosition(x,z);
+                GridPosition testGridPosition = _currentGridPosition + offsetGridPosition;
+                gridPositionInMovementRange.Add(testGridPosition);
+            }
+        }
+        return gridPositionInMovementRange;
     }
 }

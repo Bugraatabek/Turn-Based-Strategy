@@ -1,16 +1,19 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Control;
+using Controller;
 using Unity.VisualScripting;
 using UnityEngine;
 
 public class ActionSystem : MonoBehaviour
 {
-    public static event Action<IUnit> onSelectedUnitChanged;
+    public static ActionSystem Instance {get; private set;}
+    public event Action<IUnit> onSelectedUnitChanged;
+
+    public event Action<List<GridPosition>> onSelectedUnitChangedPosition;
 
     private static IUnit selectedUnit;
-    public static ActionSystem Instance {get; private set;}
+    
     
     private void Awake() 
     {
@@ -41,8 +44,16 @@ public class ActionSystem : MonoBehaviour
 
     private void ChangeSelectedUnit(IUnit unit)
     {
+        if(selectedUnit != null) selectedUnit.onValidActionGridPositionListChanged -= IUnit_OnGridPositionChanged;
+        unit.onValidActionGridPositionListChanged += IUnit_OnGridPositionChanged;
         selectedUnit = unit;
+        
         onSelectedUnitChanged?.Invoke(unit);
+    }
+
+    private void IUnit_OnGridPositionChanged(List<GridPosition> newValidGridPositionsList)
+    {
+        onSelectedUnitChangedPosition?.Invoke(newValidGridPositionsList);
     }
 
     private void OnEnable() 

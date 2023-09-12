@@ -14,14 +14,14 @@ public class UnitSelectedVisual : MonoBehaviour
         iUnit = GetComponent<IUnit>();
     }
 
-    private void OnEnable() 
+    private void Start() 
     {
-        ActionSystem.onSelectedUnitChanged += ActionSystem_OnSelectedUnitChange;
+        ActionSystem.Instance.onSelectedUnitChanged += ActionSystem_OnSelectedUnitChange;
     }
 
     private void OnDisable() 
     {
-        ActionSystem.onSelectedUnitChanged -= ActionSystem_OnSelectedUnitChange;
+        ActionSystem.Instance.onSelectedUnitChanged -= ActionSystem_OnSelectedUnitChange;
     }
 
     private void ActionSystem_OnSelectedUnitChange(IUnit unit)

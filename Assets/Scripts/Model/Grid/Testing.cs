@@ -1,17 +1,15 @@
-using Control;
+using Controller;
 using UnityEngine;
 
 public class Testing : MonoBehaviour 
 {
-    
-    
-    private void Start() 
-    {
-       
-    }
-
+    [SerializeField] Unit unit;
+    [SerializeField] GridSystemVisual gridSystemVisual;
     private void Update() 
     {
-        
+        // if(Input.GetKeyDown(KeyCode.T))
+        // {
+        //     gridSystemVisual.ShowGridPositionList(unit.GetValidActionGridPositionList());
+        // }
     }
 }
