@@ -6,6 +6,8 @@ using UnityEngine;
 public interface IUnit
 {
     public event Action<List<GridPosition>> onValidActionGridPositionListChanged;
-    public void TryInvokeMovement(Vector3 targetPosition);
+    public bool TryInvokeAction(Vector3 targetPosition, Action onActionFinished);
+    public void SetSelectedAction(BaseAction baseAction);
     public List<GridPosition> GetValidActionGridPositionList();
+    public BaseAction[] GetBaseActionArray();
 }

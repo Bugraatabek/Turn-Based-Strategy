@@ -10,7 +10,7 @@ namespace Controller
         public static InputReader Instance {get; private set;}
         public event Action<Vector3> onWASDPressed;
         public event Action<Vector3> onQEPressed;
-        public event Action onMouseButtonDown0;
+        public event Action<int> onMouseButtonDown;
         
         private void Awake() 
         {
@@ -28,8 +28,13 @@ namespace Controller
         {
             if(Input.GetMouseButtonDown(0))
             {
-                onMouseButtonDown0?.Invoke();
+                onMouseButtonDown?.Invoke(0);
             }
+
+            // if(Input.GetMouseButtonDown(1))
+            // {
+            //     onMouseButtonDown?.Invoke(1);
+            // }
 
             if(Input.GetKey(KeyCode.W))
             {

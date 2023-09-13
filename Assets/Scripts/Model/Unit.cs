@@ -3,60 +3,64 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(MoveAction))]
+[RequireComponent(typeof(MoveAction), typeof(SpinAction))]
 public class Unit : MonoBehaviour, IUnit
 {
     private MoveAction _moveAction;
-    private GridPosition _currentGridPosition;
-
-    public event Action<List<GridPosition>> onValidActionGridPositionListChanged;
-
-    private void Awake() 
+    private SpinAction _spinAction;
+    private BaseAction[] _baseActionArray;
+    private BaseAction selectedAction;
+    public event Action<List<GridPosition>> onValidActionGridPositionListChanged; //IUnit event
+    
+    
+    //IUnit Interface
+    public bool TryInvokeAction(Vector3 targetPosition, Action onActionFinished)
     {
-        _moveAction = GetComponent<MoveAction>();
+        if(selectedAction == null) return false;
+        return selectedAction.TryInvokeAction(targetPosition, onActionFinished);
     }
 
-    private void Movement_OnGridPositionChanged(GridPosition gridPosition)
+    //IUnit Interface
+    public List<GridPosition> GetValidActionGridPositionList()
     {
-        LevelGrid.Instance.RemoveUnitFromGridPosition(_currentGridPosition, this);
-        _currentGridPosition = gridPosition;
-        LevelGrid.Instance.SetUnitAtGridPosition(_currentGridPosition, this);
+        return _moveAction.GetValidActionGridPositionList();
+    }
+
+    //IUnit Interface
+    public BaseAction[] GetBaseActionArray()
+    {
+        return _baseActionArray;
+    }
+
+    private void MoveAction_OnGridPositionChanged(GridPosition gridPosition)
+    {
         onValidActionGridPositionListChanged?.Invoke(GetValidActionGridPositionList());
     }
 
-    // IUnit Interface
-    public void TryInvokeMovement(Vector3 targetPosition)
+    public GridPosition GetCurrentGridPosition()
     {
-        GridPosition targetGridPosition = LevelGrid.Instance.GetGridPosition(targetPosition);
-        if(!GetValidActionGridPositionList().Contains(targetGridPosition)) return;
-        
-        Vector3 finalDestination = LevelGrid.Instance.GetWorldPosition(targetGridPosition);
-        _moveAction.TryInvokeMovement(finalDestination);
+        return _moveAction.GetCurrentGridPosition();
     }
-
-    public List<GridPosition> GetValidActionGridPositionList()
+    
+    private void Awake() 
     {
-        List<GridPosition> validActionGridPositionList = new List<GridPosition>();
-        foreach (var gridPosition in _moveAction.GetGridPositionsInMovementRange())
-        {
-            if(LevelGrid.Instance.IsValidGridPosition(gridPosition))
-            {
-                if(gridPosition == _currentGridPosition) continue; //Same Grid Position where the unit is already at.
-                if(LevelGrid.Instance.HasAnyUnitOnGridPosition(gridPosition)) continue; //Grid Position is already occupied with another Unit.
-
-                validActionGridPositionList.Add(gridPosition);
-            }
-        }
-        return validActionGridPositionList;
+        _moveAction = GetComponent<MoveAction>();
+        _spinAction = GetComponent<SpinAction>();
+        _baseActionArray = GetComponents<BaseAction>();
     }
 
     //Subscribing to events
     private void OnEnable() 
     {
-        _moveAction.onGridPositionChanged += Movement_OnGridPositionChanged;
+        _moveAction.onGridPositionChanged += MoveAction_OnGridPositionChanged;
     }
     private void OnDisable() 
     {
-        _moveAction.onGridPositionChanged -= Movement_OnGridPositionChanged;
+        _moveAction.onGridPositionChanged -= MoveAction_OnGridPositionChanged;
+    }
+
+    public void SetSelectedAction(BaseAction baseAction)
+    {
+        selectedAction = baseAction;
     }
 }

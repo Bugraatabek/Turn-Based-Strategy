@@ -8,8 +8,8 @@ namespace Controller
     public class RaycastController : MonoBehaviour
     {
         public static RaycastController Instance {get; private set;}
-        public static event Action<Vector3> onClickedGrid;
-        public static event Action<IUnit> onClickedUnit;
+        public event Action<Vector3> onClickedGrid;
+        public event Action<IUnit> onClickedUnit;
 
         [SerializeField] private LayerMask _layerMask;
         
@@ -27,21 +27,23 @@ namespace Controller
             }
         }
 
-        private void InputReader_OnMouseButtonDown0()
+        private void InputReader_OnMouseButtonDown0(int pressedButtonNumber)
         {
-            Raycast();
+            Raycast(pressedButtonNumber);
         }
 
-        public void Raycast()
+        public void Raycast(int pressedButtonNumber)
         {
+            if(pressedButtonNumber != 0) return;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             Physics.Raycast(ray, out RaycastHit raycastHit, float.MaxValue, Instance._layerMask);
 
-            if(Instance.TryGetAUnit(raycastHit, out IUnit unit))
+            if(TryGetAUnit(raycastHit, out IUnit unit))
             {
                 onClickedUnit?.Invoke(unit);
                 print("RaycastController : A Unit Found, Calling On Click Unit Event");
             }
+            
             else
             {
                 onClickedGrid?.Invoke(raycastHit.point);
@@ -61,12 +63,12 @@ namespace Controller
 
         private void Start() 
         {
-            InputReader.Instance.onMouseButtonDown0 += InputReader_OnMouseButtonDown0;
+            InputReader.Instance.onMouseButtonDown += InputReader_OnMouseButtonDown0;
         }
 
         private void OnDisable() 
         {
-            InputReader.Instance.onMouseButtonDown0 -= InputReader_OnMouseButtonDown0;
+            InputReader.Instance.onMouseButtonDown -= InputReader_OnMouseButtonDown0;
         }
     }
 }
