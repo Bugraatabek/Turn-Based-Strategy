@@ -5,15 +5,16 @@ using UnityEngine;
 
 public class MoveAction : BaseAction
 {
+    public event Action<bool> OnMovingStateChanged;
+    public override event Action onValidGridPositionListChanged;
+    public event Action onActionFinished;
+
     [SerializeField] private float _moveSpeed = 4f;
     [SerializeField] private float _rotationSpeed = 10f;
     [SerializeField] private int maxMoveDistance;
     
     private Vector3 targetPosition;
     private GridPosition _currentGridPosition;
-    public event Action<bool> OnMovingStateChanged;
-    public event Action<GridPosition> onGridPositionChanged;
-    public event Action onActionFinished;
 
 
     private void Start() 
@@ -68,7 +69,8 @@ public class MoveAction : BaseAction
         LevelGrid.Instance.RemoveUnitFromGridPosition(_currentGridPosition, _unit);
         LevelGrid.Instance.SetUnitAtGridPosition(gridPosition, _unit);
         _currentGridPosition = gridPosition;
-        onGridPositionChanged?.Invoke(_currentGridPosition);
+        onValidGridPositionListChanged?.Invoke();
+        
     }
 
     private Vector3 GetFinalDestination(Vector3 targetPosition)
@@ -106,5 +108,10 @@ public class MoveAction : BaseAction
     public GridPosition GetCurrentGridPosition()
     {
         return _currentGridPosition;
+    }
+
+    public override int GetActionCost()
+    {
+        return 2;
     }
 }

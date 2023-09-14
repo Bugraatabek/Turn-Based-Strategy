@@ -12,7 +12,10 @@ public class ActionSystem : MonoBehaviour
     public IUnit SelectedUnit {get {return selectedUnit;}}
 
     public event Action<IUnit> onSelectedUnitChanged;
-    public event Action<List<GridPosition>> onSelectedUnitChangedPosition;
+    public event Action onSelectedActionChanged;
+    public event Action<List<GridPosition>> onSelectedUnitChangedValidActionList;
+    public event Action onSelectedUnitSpendActionPoints;
+    public event Action<bool> onBusyChanged;
 
 
     private IUnit selectedUnit;
@@ -33,38 +36,62 @@ public class ActionSystem : MonoBehaviour
 
     public void SetSelectedAction(BaseAction baseAction)
     {
+        if(_isBusy) return;
+        //if(selectedUnit.IsTurnFinished()) return; If you want to lock actions after turn is finished uncomment.
         selectedUnit.SetSelectedAction(baseAction);
+        onSelectedActionChanged?.Invoke();
     }
 
     private void RaycastController_onClickGrid(Vector3 targetPosition)
     {
         if(_isBusy) return;
-        if(selectedUnit?.TryInvokeAction(targetPosition,ClearIsBusy) == true) _isBusy = true;
+        if(selectedUnit == null) return;
+        if(selectedUnit.IsTurnFinished()) return;
+        if(selectedUnit.TryInvokeAction(targetPosition,ClearIsBusy) == true) SetIsBusy();
+        
     }
 
     private void RaycastController_onClickUnit(IUnit unit)
     {
+        if(unit.IsEnemy()) return;
         if(_isBusy) return;
+        //if(unit.IsTurnFinished()) return; if you don't want a unit to be selectable after its turn is finished uncomment.
         ChangeSelectedUnit(unit);
     }
 
-    private void IUnit_OnGridPositionChanged(List<GridPosition> newValidGridPositionsList)
+    private void IUnit_OnValidActionGridPositionListChanged(List<GridPosition> newValidGridPositionsList)
     {
-        onSelectedUnitChangedPosition?.Invoke(newValidGridPositionsList);
+        onSelectedUnitChangedValidActionList?.Invoke(newValidGridPositionsList);
+    }
+
+    private void IUnit_ActionPointsChanged()
+    {
+        onSelectedUnitSpendActionPoints?.Invoke();
+    }
+
+    private void SetIsBusy()
+    {
+        _isBusy = true;
+        onBusyChanged?.Invoke(true);
     }
 
     private void ClearIsBusy()
     {
         _isBusy = false;
+        onBusyChanged?.Invoke(false);
     }
 
     private void ChangeSelectedUnit(IUnit unit)
     {
+        if(_isBusy) return;
         if(selectedUnit != null) 
         {
-            selectedUnit.onValidActionGridPositionListChanged -= IUnit_OnGridPositionChanged;
+            selectedUnit.onValidActionGridPositionListChanged -= IUnit_OnValidActionGridPositionListChanged;
+            selectedUnit.onActionPointsChanged -= IUnit_ActionPointsChanged;
         }
-        unit.onValidActionGridPositionListChanged += IUnit_OnGridPositionChanged;
+        if(unit == null) return;
+        unit.onValidActionGridPositionListChanged += IUnit_OnValidActionGridPositionListChanged;
+        unit.onActionPointsChanged += IUnit_ActionPointsChanged;
         
         selectedUnit = unit;
         onSelectedUnitChanged?.Invoke(unit);
@@ -74,6 +101,18 @@ public class ActionSystem : MonoBehaviour
     {
         RaycastController.Instance.onClickedGrid += RaycastController_onClickGrid;
         RaycastController.Instance.onClickedUnit += RaycastController_onClickUnit;
+        TurnSystem.Instance.onCombatStarted += TurnSystem_OnCombatStarted;
+        TurnSystem.Instance.onSelectedUnitFinishedTurn += TurnSystem_OnSelectedUnitFinishedTurn;
+    }
+
+    private void TurnSystem_OnSelectedUnitFinishedTurn()
+    {
+        ChangeSelectedUnit(TurnSystem.Instance.GetUnitPlayingCurrentTurn());
+    }
+
+    private void TurnSystem_OnCombatStarted()
+    {
+        ChangeSelectedUnit(TurnSystem.Instance.GetUnitPlayingCurrentTurn());
     }
 
     private void OnDisable() 

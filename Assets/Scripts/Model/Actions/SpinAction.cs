@@ -7,11 +7,13 @@ public class SpinAction : BaseAction
 {
     private float _totalSpinAmount;
     public event Action onActionFinished;
+    public override event Action onValidGridPositionListChanged;
 
     public override bool TryInvokeAction(Vector3 targetPosition, Action onActionFinished)
     {
         if(_isActive) return false;
         if(!IsValidActionGridPosition(targetPosition)) return false;
+        onValidGridPositionListChanged?.Invoke();
         
         this.onActionFinished = onActionFinished;
         _isActive = true;
@@ -46,11 +48,16 @@ public class SpinAction : BaseAction
 
     public override List<GridPosition> GetValidActionGridPositionList()
     {
-        GridPosition currentGridPosition = _unit.GetCurrentGridPosition();
+        GridPosition currentGridPosition = LevelGrid.Instance.GetGridPosition(transform.position);
 
         return new List<GridPosition>
         {
             currentGridPosition
         };
+    }
+
+    public override int GetActionCost()
+    {
+        return 1;
     }
 }

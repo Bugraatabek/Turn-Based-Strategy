@@ -29,10 +29,10 @@ public class GridSystemVisual : MonoBehaviour
 
 
         ActionSystem.Instance.onSelectedUnitChanged += ActionSystem_OnSelectedUnitChanged;
-        ActionSystem.Instance.onSelectedUnitChangedPosition += ActionSystem_OnSelectedUnitChangedPosition;
+        ActionSystem.Instance.onSelectedUnitChangedValidActionList += ActionSystem_OnSelectedUnitChangedValidActionList;
     }
 
-    private void ActionSystem_OnSelectedUnitChangedPosition(List<GridPosition> gridPositionList)
+    private void ActionSystem_OnSelectedUnitChangedValidActionList(List<GridPosition> gridPositionList)
     {
         ShowGridPositionList(gridPositionList);
     }
@@ -53,6 +53,7 @@ public class GridSystemVisual : MonoBehaviour
     public void ShowGridPositionList(List<GridPosition> gridPositionList)
     {
         HideAllGridPositions();
+        if(gridPositionList == null) return;
         foreach (var gridPosition in gridPositionList)
         {
             GridSystemVisualSingle gridSystemVisualSingle = _gridSystemVisualSingleArray[gridPosition.x,gridPosition.z];

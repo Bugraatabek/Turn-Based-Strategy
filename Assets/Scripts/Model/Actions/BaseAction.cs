@@ -7,6 +7,7 @@ public abstract class BaseAction : MonoBehaviour
 {
     protected bool _isActive;
     protected Unit _unit;
+    public virtual event Action onValidGridPositionListChanged;
 
     protected virtual void Awake()
     {
@@ -21,6 +22,7 @@ public abstract class BaseAction : MonoBehaviour
         return true;
     }
 
+    public abstract int GetActionCost();
     public abstract string GetActionName(); 
     public abstract bool TryInvokeAction(Vector3 targetPosition, Action onActionFinished);
     public abstract List<GridPosition> GetValidActionGridPositionList();

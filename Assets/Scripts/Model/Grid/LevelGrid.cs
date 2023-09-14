@@ -31,7 +31,6 @@ public class LevelGrid : MonoBehaviour
     {
         GridObject gridObjectAtPosition = _gridSystem.GetGridObject(gridPosition);
         gridObjectAtPosition.AddUnit(unit);
-        print("LevelGrid Script: Inside SetUnitAtGridPosition");
     }
 
     public List<Unit> GetUnitsListAtGridPosition(GridPosition gridPosition)

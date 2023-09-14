@@ -118,7 +118,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6ba9f4735549d5b44b46a1e2a07ff751, type: 2}
+  - {fileID: 2100000, guid: 7d22fc6b9a431b043a917fb89a80bcfc, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -361,7 +361,7 @@ GameObject:
   - component: {fileID: 6834099163674480223}
   - component: {fileID: 5914974046433456901}
   m_Layer: 7
-  m_Name: Unit
+  m_Name: Enemy Unit
   m_TagString: Unit
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -409,6 +409,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b00db3c5d282be47829d812ae2d6528, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isEnemy: 1
 --- !u!114 &2045300924115828726
 MonoBehaviour:
   m_ObjectHideFlags: 0
