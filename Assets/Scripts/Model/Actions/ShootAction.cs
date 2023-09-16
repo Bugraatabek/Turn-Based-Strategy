@@ -132,15 +132,15 @@ public class ShootAction : BaseAction
                     if(!LevelGrid.Instance.HasAnyUnitOnGridPosition(testGridPosition)) continue;
 
                     Unit targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(testGridPosition);
-                    if(!targetUnit.IsEnemy()) continue;
+                    if(targetUnit.IsEnemy() == _unit.IsEnemy()) continue;
                     
                     validActionGridPositionsList.Add(testGridPosition);
                 }
             }
         }
-
         return validActionGridPositionsList;
     }
+
 
     public Unit GetTargetUnit()
     {
@@ -150,5 +150,24 @@ public class ShootAction : BaseAction
     public Unit GetUnit()
     {
         return _unit;
+    }
+
+    public int GetRange()
+    {
+        return _maxRange;
+    }
+
+    public int GetTargetCountAtPosition(GridPosition gridPosition)
+    {
+        return GetValidActionGridPositionList().Count;
+    }
+
+    public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
+    {
+        return new EnemyAIAction
+        {
+            gridPosition = gridPosition,
+            actionValue = 100,
+        };
     }
 }

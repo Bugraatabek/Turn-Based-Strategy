@@ -17,13 +17,12 @@ public interface IUnit
     public void ResetTurn();
     public void SetInitiative(int initiative);
 
-
+    public GridPosition GetGridPosition();
     public int GetInitiative();
     public bool IsEnemy();
     public bool IsTurnFinished();
     public bool IsDead();
     
-
     public BaseAction GetSelectedAction();
     public List<GridPosition> GetValidActionGridPositionList();
     public BaseAction[] GetBaseActionArray();

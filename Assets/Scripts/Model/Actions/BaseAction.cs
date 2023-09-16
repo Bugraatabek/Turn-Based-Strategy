@@ -7,10 +7,13 @@ public abstract class BaseAction : MonoBehaviour
 {   
     public static event EventHandler OnAnyActionStarted;
     public static event EventHandler OnAnyActionFinished;
+    public virtual event Action onValidGridPositionListChanged;
+
     protected bool _isActive;
     protected Unit _unit;
     protected Action onActionFinished;
-    public virtual event Action onValidGridPositionListChanged;
+
+    
 
     protected virtual void Awake()
     {
@@ -46,6 +49,30 @@ public abstract class BaseAction : MonoBehaviour
         OnAnyActionFinished?.Invoke(this, EventArgs.Empty);
     }
     
+    public EnemyAIAction GetBestEnemyAIAction()
+    {
+        List<EnemyAIAction> enemyAIActionList = new List<EnemyAIAction>();
+        List<GridPosition> validActionGridPositionList = GetValidActionGridPositionList();
+
+        foreach (GridPosition gridPosition in validActionGridPositionList)
+        {
+            EnemyAIAction enemyAIAction = GetEnemyAIAction(gridPosition);
+            enemyAIActionList.Add(enemyAIAction);
+        }
+
+        if(enemyAIActionList.Count > 0)
+        {
+            enemyAIActionList.Sort((EnemyAIAction a, EnemyAIAction b) => b.actionValue - a.actionValue);
+            return enemyAIActionList[0];
+        }
+        else
+        {
+            //No possible Enemy AI Actions
+            return null;
+        }
+    }
+
+    public abstract EnemyAIAction GetEnemyAIAction(GridPosition gridPosition);
     public abstract bool TryInvokeAction(Vector3 targetPosition, Action onActionFinished);
     public abstract int GetActionCost();
     public abstract string GetActionName(); 

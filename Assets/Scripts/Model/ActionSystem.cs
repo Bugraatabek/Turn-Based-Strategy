@@ -12,7 +12,7 @@ public class ActionSystem : MonoBehaviour
     public IUnit SelectedUnit {get {return selectedUnit;}}
 
     public event Action<IUnit> onSelectedUnitChanged;
-    public event Action onSelectedActionChanged;
+    public event Action<BaseAction> onSelectedActionChanged;
     public event Action<List<GridPosition>> onSelectedUnitChangedValidActionList;
     public event Action onSelectedUnitSpendActionPoints;
     public event Action<bool> onBusyChanged;
@@ -39,7 +39,7 @@ public class ActionSystem : MonoBehaviour
         if(_isBusy) return;
         //if(selectedUnit.IsTurnFinished()) return; If you want to lock actions after turn is finished uncomment.
         selectedUnit.SetSelectedAction(baseAction);
-        onSelectedActionChanged?.Invoke();
+        onSelectedActionChanged?.Invoke(baseAction);
     }
 
     private void RaycastController_onClickGrid(Vector3 targetPosition)

@@ -32,13 +32,13 @@ public class ActionSystemUI : MonoBehaviour
     private void ActionSystem_OnSelectedUnitChanged(IUnit selectedUnit)
     {
         UpdateUnitActionButtons(selectedUnit);
-        UpdateSelectedActionVisual();
+        UpdateSelectedActionVisual(selectedUnit.GetSelectedAction());
         UpdateActionPointsText();
     }
 
-    private void ActionSystem_OnSelectedActionChanged()
+    private void ActionSystem_OnSelectedActionChanged(BaseAction selectedAction)
     {
-        UpdateSelectedActionVisual();
+        UpdateSelectedActionVisual(selectedAction);
     }
 
     private void UpdateUnitActionButtons(IUnit selectedUnit)
@@ -67,11 +67,11 @@ public class ActionSystemUI : MonoBehaviour
         }
     }
 
-    private void UpdateSelectedActionVisual()
+    private void UpdateSelectedActionVisual(BaseAction selectedAction)
     {
         foreach (ActionButtonUI actionButtonInstance in _actionButtonInstanceList)
         {
-            actionButtonInstance.SetSelectedVisual(_selectedUnit.GetSelectedAction());
+            actionButtonInstance.SetSelectedVisual(selectedAction);
         }
     }
 

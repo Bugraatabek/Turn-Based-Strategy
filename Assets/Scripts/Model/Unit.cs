@@ -175,4 +175,10 @@ public class Unit : MonoBehaviour, IUnit
     {
         _health.TakeDamage(damageAmount);
     }
+
+    //IUnit interface
+    public GridPosition GetGridPosition()
+    {
+        return LevelGrid.Instance.GetGridPosition(transform.position);
+    }
 }
