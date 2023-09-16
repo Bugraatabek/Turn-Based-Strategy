@@ -6,7 +6,6 @@ using UnityEngine;
 public class UnitSelectedVisual : MonoBehaviour
 {
     [SerializeField] private MeshRenderer _meshRenderer;
-    [SerializeField] Unit parentUnit;
     private IUnit iUnit;
 
     private void Awake() 

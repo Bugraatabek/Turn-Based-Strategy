@@ -6,18 +6,15 @@ using UnityEngine;
 public class SpinAction : BaseAction
 {
     private float _totalSpinAmount;
-    public event Action onActionFinished;
     public override event Action onValidGridPositionListChanged;
 
     public override bool TryInvokeAction(Vector3 targetPosition, Action onActionFinished)
     {
-        if(_isActive) return false;
-        if(!IsValidActionGridPosition(targetPosition)) return false;
-        onValidGridPositionListChanged?.Invoke();
+        if(!MeetsTheConditions(targetPosition)) return false;
+
+        //onValidGridPositionListChanged?.Invoke();
         
-        this.onActionFinished = onActionFinished;
-        _isActive = true;
-        
+        ActionStart(onActionFinished);
         StartCoroutine(Spin());
         return true;
     }
@@ -33,8 +30,7 @@ public class SpinAction : BaseAction
             if(_totalSpinAmount >= 360f) 
             {
                 _totalSpinAmount = 0;
-                _isActive = false;
-                onActionFinished?.Invoke();
+                ActionFinished();
                 yield break;
             }
             yield return new WaitForEndOfFrame();

@@ -7,7 +7,7 @@ public class MoveAction : BaseAction
 {
     public event Action<bool> OnMovingStateChanged;
     public override event Action onValidGridPositionListChanged;
-    public event Action onActionFinished;
+    //public event Action onActionFinished;
 
     [SerializeField] private float _moveSpeed = 4f;
     [SerializeField] private float _rotationSpeed = 10f;
@@ -24,28 +24,25 @@ public class MoveAction : BaseAction
 
     public override bool TryInvokeAction(Vector3 targetPosition, Action onActionFinished)
     {
-        if(_isActive) return false;
-        if(!IsValidActionGridPosition(targetPosition)) return false;
-        
-        this.onActionFinished = onActionFinished; 
-        _isActive = true;
+        if(!MeetsTheConditions(targetPosition)) return false;
 
         this.targetPosition = GetFinalDestination(targetPosition);
+        ActionStart(onActionFinished);
         StartCoroutine(Move());
         return true;
     }
 
     private IEnumerator Move()
     {
+        
         OnMovingStateChanged?.Invoke(true);
         float stoppingDistance = 0.1f;
         while(true)
         {
             if(Vector3.Distance(transform.position, targetPosition) <= stoppingDistance) 
             {
-                _isActive = false;
                 OnMovingStateChanged?.Invoke(false);
-                onActionFinished?.Invoke();
+                ActionFinished();
                 UpdateCurrentGridPosition(); // updates _currentGridPosition after the action is finished.
                 yield break;
             }

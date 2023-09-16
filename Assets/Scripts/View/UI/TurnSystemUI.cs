@@ -15,17 +15,14 @@ public class TurnSystemUI : MonoBehaviour
 
     private void Start() 
     {
-        TurnSystem.Instance.onEveryTurnFinished += TurnSystem_OnEveryTurnFinished;
-        TurnSystem.Instance.onSelectedUnitFinishedTurn += TurnSystem_OnSelectedUnitFinishedTurn;
+        //TurnSystem.Instance.onEveryTurnFinished += TurnSystem_OnEveryTurnFinished;
         TurnSystem.Instance.onNewTurn += TurnSystem_OnNewTurn;
-
         ActionSystem.Instance.onSelectedUnitChanged += ActionSystem_OnSelectedUnitChanged;
         
-        _nextTurnButton.onClick.AddListener(() => 
-        {
-            TurnSystem.Instance.NextTurn();
-        });
-
+        // _nextTurnButton.onClick.AddListener(() => 
+        // {
+        //     TurnSystem.Instance.NextTurn();
+        // });
 
         _selectedUnit = ActionSystem.Instance.SelectedUnit;
         StartCoroutine(WaitAWhileBeforeUpdatingUI()); // Because There is a Race Condition With Turn System
@@ -36,15 +33,10 @@ public class TurnSystemUI : MonoBehaviour
         UpdateUI();
     }
 
-    private void TurnSystem_OnSelectedUnitFinishedTurn()
-    {
-        UpdateUI();
-    }
-
-    private void TurnSystem_OnEveryTurnFinished()
-    {
-        UpdateUI();
-    }
+    // private void TurnSystem_OnEveryTurnFinished()
+    // {
+    //     UpdateUI();
+    // }
 
     private void ActionSystem_OnSelectedUnitChanged(IUnit unit)
     {
@@ -54,37 +46,45 @@ public class TurnSystemUI : MonoBehaviour
         }
         _endTurnButton.onClick.AddListener(unit.FinishTurn);
         _selectedUnit = unit;
+        
         UpdateUI();
     }
 
     private void UpdateUI()
     {
         _turnNumberText.text = $"Turn {TurnSystem.Instance.CurrentTurn}";
+        
         _nextTurnButton.gameObject.SetActive(false);
-        _turnFinishedTextGameObject.SetActive(false);
         _endTurnButton.gameObject.SetActive(true);
+        _turnFinishedTextGameObject.SetActive(false);
 
-        if(TurnSystem.Instance.IsEveryTurnFinished())
+        if(_selectedUnit.IsEnemy()) 
         {
-            _nextTurnButton.gameObject.SetActive(true);
             _endTurnButton.gameObject.SetActive(false);
             return;
         }
 
-        if(_selectedUnit == null)
-        {
-            _nextTurnButton.gameObject.SetActive(false);
-            _endTurnButton.gameObject.SetActive(false);
-            return;
-        }
+        // if(TurnSystem.Instance.IsEveryTurnFinished())
+        // {
+        //     _nextTurnButton.gameObject.SetActive(true);
+        //     _endTurnButton.gameObject.SetActive(false);
+        //     return;
+        // }
 
-        if(_selectedUnit != null && _selectedUnit.IsTurnFinished())
-        {
-            _nextTurnButton.gameObject.SetActive(false);
-            _endTurnButton.gameObject.SetActive(false);
-            _turnFinishedTextGameObject.gameObject.SetActive(true);
-            return;
-        }
+        // if(_selectedUnit == null)
+        // {
+        //     _nextTurnButton.gameObject.SetActive(false);
+        //     _endTurnButton.gameObject.SetActive(false);
+        //     return;
+        // }
+
+        // if(_selectedUnit != null && _selectedUnit.IsTurnFinished())
+        // {
+        //     _nextTurnButton.gameObject.SetActive(false);
+        //     _endTurnButton.gameObject.SetActive(false);
+        //     _turnFinishedTextGameObject.gameObject.SetActive(true);
+        //     return;
+        // }
     }
 
     private IEnumerator WaitAWhileBeforeUpdatingUI()

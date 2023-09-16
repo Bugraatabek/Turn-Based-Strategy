@@ -51,12 +51,14 @@ public class ActionSystem : MonoBehaviour
         
     }
 
-    private void RaycastController_onClickUnit(IUnit unit)
+    private void RaycastController_onClickUnit(IUnit unit, Vector3 targetPosition)
     {
-        if(unit.IsEnemy()) return;
+        //if(unit.IsEnemy()) return;
         if(_isBusy) return;
-        //if(unit.IsTurnFinished()) return; if you don't want a unit to be selectable after its turn is finished uncomment.
-        ChangeSelectedUnit(unit);
+        if(!unit.IsEnemy()) return;
+        if(selectedUnit.TryInvokeAction(targetPosition,ClearIsBusy) == true) SetIsBusy();
+        
+        //ChangeSelectedUnit(unit);
     }
 
     private void IUnit_OnValidActionGridPositionListChanged(List<GridPosition> newValidGridPositionsList)
@@ -67,6 +69,11 @@ public class ActionSystem : MonoBehaviour
     private void IUnit_ActionPointsChanged()
     {
         onSelectedUnitSpendActionPoints?.Invoke();
+    }
+
+    private void TurnSystem_OnNextUnitTurn(IUnit unit)
+    {
+        ChangeSelectedUnit(unit);
     }
 
     private void SetIsBusy()
@@ -84,12 +91,12 @@ public class ActionSystem : MonoBehaviour
     private void ChangeSelectedUnit(IUnit unit)
     {
         if(_isBusy) return;
+        // if(unit.IsEnemy())
         if(selectedUnit != null) 
         {
             selectedUnit.onValidActionGridPositionListChanged -= IUnit_OnValidActionGridPositionListChanged;
             selectedUnit.onActionPointsChanged -= IUnit_ActionPointsChanged;
         }
-        if(unit == null) return;
         unit.onValidActionGridPositionListChanged += IUnit_OnValidActionGridPositionListChanged;
         unit.onActionPointsChanged += IUnit_ActionPointsChanged;
         
@@ -101,23 +108,14 @@ public class ActionSystem : MonoBehaviour
     {
         RaycastController.Instance.onClickedGrid += RaycastController_onClickGrid;
         RaycastController.Instance.onClickedUnit += RaycastController_onClickUnit;
-        TurnSystem.Instance.onCombatStarted += TurnSystem_OnCombatStarted;
-        TurnSystem.Instance.onSelectedUnitFinishedTurn += TurnSystem_OnSelectedUnitFinishedTurn;
+        TurnSystem.Instance.onNextUnitTurn += TurnSystem_OnNextUnitTurn;
     }
 
-    private void TurnSystem_OnSelectedUnitFinishedTurn()
-    {
-        ChangeSelectedUnit(TurnSystem.Instance.GetUnitPlayingCurrentTurn());
-    }
-
-    private void TurnSystem_OnCombatStarted()
-    {
-        ChangeSelectedUnit(TurnSystem.Instance.GetUnitPlayingCurrentTurn());
-    }
-
+   
     private void OnDisable() 
     {
         RaycastController.Instance.onClickedGrid -= RaycastController_onClickGrid;
         RaycastController.Instance.onClickedUnit -= RaycastController_onClickUnit;
+        TurnSystem.Instance.onNextUnitTurn -= TurnSystem_OnNextUnitTurn;
     }
 }

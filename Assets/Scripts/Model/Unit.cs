@@ -3,27 +3,44 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Health))]
 public class Unit : MonoBehaviour, IUnit
 {
     public event Action<List<GridPosition>> onValidActionGridPositionListChanged; //IUnit event
     public event Action onActionPointsChanged;
     public event Action<IUnit> onTurnFinished;
+    public event Action<IUnit> onDead;
     [SerializeField] private bool isEnemy;
 
-    private InitiativeSystem initiativeSystem;
-    private bool _isTurnFinished = false;
+    private Health _health;
     private BaseAction[] _baseActionArray;
     private BaseAction _selectedAction;
+    
+    [SerializeField] private int _initiative;
+    private bool _isTurnFinished = false;
     private int _maxActionPoints = 10;
     private int _currentActionPoints;
-    [SerializeField] private int _initiative;
     
 
     private void Awake() 
     {
         _baseActionArray = GetComponents<BaseAction>();
+        _health = GetComponent<Health>();
         _currentActionPoints = _maxActionPoints;
-        //_initiative = initiativeSystem.GetAnInitiative();
+    }
+
+    private void Start() 
+    {
+        _health.onDead += Health_OnDead;
+    }
+
+    private void Health_OnDead()
+    {
+        GridPosition gridPosition = LevelGrid.Instance.GetGridPosition(transform.position);
+        LevelGrid.Instance.RemoveUnitFromGridPosition(gridPosition, this);
+        onValidActionGridPositionListChanged?.Invoke(GetValidActionGridPositionList());
+        onDead?.Invoke(this);
+        Destroy(gameObject);
     }
 
     //IUnit Interface
@@ -139,8 +156,23 @@ public class Unit : MonoBehaviour, IUnit
         return isEnemy;
     }
 
+    public bool IsDead()
+    {
+        return _health.IsDead();
+    }
+
+    public void SetInitiative(int initiative)
+    {
+        _initiative = initiative;
+    }
+
     public int GetInitiative()
     {
         return _initiative;
+    }
+
+    public void TakeDamage(int damageAmount)
+    {
+        _health.TakeDamage(damageAmount);
     }
 }

@@ -4,19 +4,37 @@ using UnityEngine;
 public class InitiativeSystem 
 {
     private int maxInitiative = 20;
-    private int minInitiative = 1;
 
-    private List<int> _takenInitiativesList = new List<int>();
-    public InitiativeSystem(){}
-
-    public int GetAnInitiative()
+    private List<int> _availableInitiativesList = new List<int>();
+    
+    public InitiativeSystem()
     {
-        int randomInitiative = Random.Range(minInitiative,maxInitiative);
-        if(_takenInitiativesList.Contains(randomInitiative))
+        
+    }
+
+    private void BuildAvailableInitiativesList()
+    {
+        _availableInitiativesList = new List<int>();
+        for (int i = 0; i < maxInitiative; i++)
         {
-            randomInitiative = GetAnInitiative();
+            _availableInitiativesList.Add(i);
         }
-        _takenInitiativesList.Add(randomInitiative);
+    }
+
+    private int GetAnInitiative()
+    {
+        if(_availableInitiativesList.Count <= 0) BuildAvailableInitiativesList();
+
+        int randomInitiative = _availableInitiativesList[Random.Range(0,_availableInitiativesList.Count)];
+        _availableInitiativesList.Remove(randomInitiative);
         return randomInitiative;
+    }
+
+    public void SetInitiatives(List<IUnit> units)
+    {
+        foreach (IUnit unit in units)
+        {
+            unit.SetInitiative(GetAnInitiative());
+        }
     }
 }
