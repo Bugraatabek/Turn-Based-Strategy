@@ -10,7 +10,7 @@ public class LevelGrid : MonoBehaviour
     [SerializeField] private Transform gridDebugObjectPrefab;
     [SerializeField] private int _width, _height;
     private const float _cellSize = 2f;
-    private GridSystem _gridSystem;
+    private GridSystem<GridObject> _gridSystem;
 
     private void Awake() 
     {
@@ -23,8 +23,8 @@ public class LevelGrid : MonoBehaviour
             Instance = this;
         }
 
-        _gridSystem = new GridSystem(_width,_height,_cellSize);
-        _gridSystem.CreateDebugObjects(gridDebugObjectPrefab);
+        _gridSystem = new GridSystem<GridObject>(_width,_height,_cellSize, (GridSystem<GridObject> g , GridPosition gridPosition) => new GridObject(g,gridPosition));
+        // _gridSystem.CreateDebugObjects(gridDebugObjectPrefab);
     }
 
     public void SetUnitAtGridPosition(GridPosition gridPosition, Unit unit)

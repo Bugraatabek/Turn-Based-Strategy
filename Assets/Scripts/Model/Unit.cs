@@ -83,6 +83,18 @@ public class Unit : MonoBehaviour, IUnit
         return _selectedAction;
     }
 
+    public T GetAction<T>() where T : BaseAction
+    {
+        foreach (BaseAction baseAction in _baseActionArray)
+        {
+            if(baseAction is T)
+            {
+                return (T)baseAction;
+            }
+        }
+        return null;
+    }
+
     //IUnit Interface
     public int GetCurrentActionPoints()
     {
@@ -174,6 +186,11 @@ public class Unit : MonoBehaviour, IUnit
     public void TakeDamage(int damageAmount)
     {
         _health.TakeDamage(damageAmount);
+    }
+
+    public float GetHealthNormalized()
+    {
+       return _health.GetHealthNormalized();
     }
 
     //IUnit interface

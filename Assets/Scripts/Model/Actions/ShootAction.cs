@@ -98,7 +98,7 @@ public class ShootAction : BaseAction
 
     private void Shoot()
     {
-        targetUnit.TakeDamage(40);
+        targetUnit.TakeDamage(30);
         if(targetUnit.IsDead()) { onValidGridPositionListChanged?.Invoke(); }
         onShoot?.Invoke(targetUnit.transform.position);
         canShootBullet = false;
@@ -114,7 +114,7 @@ public class ShootAction : BaseAction
         return "Shoot";
     }
 
-    public override List<GridPosition> GetValidActionGridPositionList()
+    public List<GridPosition> GetValidActionGridPositionList(GridPosition gridPosition)
     {
         List<GridPosition> validActionGridPositionsList = new List<GridPosition>();
         GridPosition currentGridPosition = LevelGrid.Instance.GetGridPosition(transform.position);
@@ -141,6 +141,12 @@ public class ShootAction : BaseAction
         return validActionGridPositionsList;
     }
 
+    public override List<GridPosition> GetValidActionGridPositionList()
+    {
+        GridPosition gridPosition = _unit.GetGridPosition();
+        return GetValidActionGridPositionList(gridPosition);
+    }
+
 
     public Unit GetTargetUnit()
     {
@@ -159,15 +165,19 @@ public class ShootAction : BaseAction
 
     public int GetTargetCountAtPosition(GridPosition gridPosition)
     {
-        return GetValidActionGridPositionList().Count;
+        return GetValidActionGridPositionList(gridPosition).Count;
     }
 
     public override EnemyAIAction GetEnemyAIAction(GridPosition gridPosition)
     {
+        Unit targetUnit = LevelGrid.Instance.GetUnitAtGridPosition(gridPosition);
+        
         return new EnemyAIAction
         {
             gridPosition = gridPosition,
-            actionValue = 100,
+            actionValue = 100 + Mathf.RoundToInt( (1 - targetUnit.GetHealthNormalized()) * 100f )
         };
+
+        
     }
 }

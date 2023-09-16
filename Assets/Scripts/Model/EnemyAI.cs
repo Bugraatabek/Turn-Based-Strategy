@@ -54,6 +54,7 @@ public class EnemyAI : MonoBehaviour
                         if(!TryInvokeAIACtion(SetStateTakingTurn))
                         {
                             _currentEnemyUnit.FinishTurn();
+                            bestEnemyAIAction = null;
                             yield break;
                         }
                     }
@@ -75,7 +76,7 @@ public class EnemyAI : MonoBehaviour
     private bool TryInvokeAIACtion(Action onEnemyAIActionComplete)
     {
         BaseAction baseAction = GetBestAction();
-        _currentEnemyUnit.SetSelectedAction(baseAction);
+        ActionSystem.Instance.SetSelectedAction(baseAction);
         Vector3 targetPosition = PickPositionToUsetheAction(bestEnemyAIAction.gridPosition);
 
         if(!_currentEnemyUnit.TryInvokeAction(targetPosition, onEnemyAIActionComplete)) return false;
