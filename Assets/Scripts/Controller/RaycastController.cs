@@ -66,7 +66,10 @@ namespace Controller
 
         public Vector3 GetMousePosition()
         {
-            return Instance._mousePosition;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Physics.Raycast(ray, out RaycastHit raycastHit, float.MaxValue, Instance._layerMask);
+            return raycastHit.point;
+
         }
 
         private void Start() 
